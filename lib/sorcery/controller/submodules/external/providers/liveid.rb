@@ -37,7 +37,6 @@ module Sorcery
                               :user_info_url,
                               :scope,
                               :user_info_mapping
-                attr_reader   :access_token
 
                 include Protocols::Oauth2
 
@@ -56,6 +55,7 @@ module Sorcery
                   response = @access_token.get(@user_info_url)
                   user_hash[:user_info] = JSON.parse(response)
                   user_hash[:uid] = user_hash[:user_info]['id']
+                  user_hash[:access_token] = @access_token.token
                   user_hash
                 end
 

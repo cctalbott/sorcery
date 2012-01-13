@@ -36,7 +36,6 @@ module Sorcery
                               :scope,
                               :user_info_mapping,
                               :display
-                attr_reader   :access_token
 
                 include Protocols::Oauth2
             
@@ -53,6 +52,7 @@ module Sorcery
                   response = @access_token.get(@user_info_path)
                   user_hash[:user_info] = JSON.parse(response.body)
                   user_hash[:uid] = user_hash[:user_info]['id']
+                  user_hash[:access_token] = @access_token.token
                   user_hash
                 end
                 
@@ -74,7 +74,7 @@ module Sorcery
                   @access_token = self.get_access_token(args, options)
                 end
 
-                # overrided fo protocols/oauth2.rb
+                # overrided for protocols/oauth2.rb
                 def get_access_token(args, options = {})
                   client = build_client(options)
                   client.auth_code.get_token(

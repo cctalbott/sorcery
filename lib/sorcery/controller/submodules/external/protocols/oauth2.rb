@@ -19,17 +19,10 @@ module Sorcery
             end
 
             def get_access_token(args, options = {})
-              options = options.merge( :token_url => 'oauth/access_token' ) # only for facebook
               client = build_client(options)
               client.auth_code.get_token(
                 args[:code],
-                {
-                  :redirect_uri => @callback_url,
-                  :parse => :query
-                },
-                {
-                  :header_format => 'OAuth %s'
-                }
+                :redirect_uri => @callback_url
               )
             end
 

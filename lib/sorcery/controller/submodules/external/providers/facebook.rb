@@ -70,7 +70,23 @@ module Sorcery
                 def process_callback(params,session)
                   args = {}
                   args.merge!({:code => params[:code]}) if params[:code]
-                  @access_token = self.get_access_token(args)
+                  options = {:token_url => 'oauth/access_token'}
+                  @access_token = self.get_access_token(args, options)
+                end
+
+                # overrided fo protocols/oauth2.rb
+                def get_access_token(args, options = {})
+                  client = build_client(options)
+                  client.auth_code.get_token(
+                    args[:code],
+                    {
+                      :redirect_uri => @callback_url,
+                      :parse => :query
+                    },
+                    {
+                      :header_format => 'OAuth %s'
+                    }
+                  )
                 end
                 
               end

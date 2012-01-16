@@ -19,16 +19,19 @@ module Sorcery
               attr_accessor :register_login_time
               attr_accessor :register_logout_time
               attr_accessor :register_last_activity_time
-            
+              attr_accessor :increase_login_count
+
               def merge_activity_logging_defaults!
                 @defaults.merge!(:@register_login_time         => true,
                                  :@register_logout_time        => true,
-                                 :@register_last_activity_time => true)
+                                 :@register_last_activity_time => true,
+                                 :@increase_login_count => true)
               end
             end
             merge_activity_logging_defaults!
           end
           Config.after_login    << :register_login_time_to_db
+          Config.after_login    << :increase_login_count_to_db
           Config.before_logout  << :register_logout_time_to_db
           base.after_filter :register_last_activity_time_to_db
         end
@@ -68,6 +71,13 @@ module Sorcery
             return unless Config.register_last_activity_time
             return unless logged_in?
             current_user.update_single_attribute(current_user.sorcery_config.last_activity_at_attribute_name, Time.now.in_time_zone)
+          end
+
+          # registers login count after every login
+          # This runs as a hook just after a successful login.
+          def increase_login_count_to_db(user, credentials)
+            return unless Config.increase_login_count
+            user.increase_login_count! if user
           end
         end
       end

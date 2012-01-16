@@ -9,12 +9,14 @@ module Sorcery
       module ActivityLogging
         def self.included(base)
           base.extend(ClassMethods)
+          base.send(:include, InstanceMethods)
 
           base.sorcery_config.class_eval do
             attr_accessor :last_login_at_attribute_name,                  # last login attribute name.
                           :last_logout_at_attribute_name,                 # last logout attribute name.
                           :last_activity_at_attribute_name,               # last activity attribute name.
-                          :activity_timeout                               # how long since last activity is 
+                          :login_count_attribute_name,                    # login count attribute name.
+                          :activity_timeout                               # how long since last activity is
                                                                           #the user defined logged out?
           end
           
@@ -22,6 +24,7 @@ module Sorcery
             @defaults.merge!(:@last_login_at_attribute_name                => :last_login_at,
                              :@last_logout_at_attribute_name               => :last_logout_at,
                              :@last_activity_at_attribute_name             => :last_activity_at,
+                             :@login_count_attribute_name                  => :login_count,
                              :@activity_timeout                            => 10 * 60)
             reset!
           end
@@ -42,6 +45,17 @@ module Sorcery
             field sorcery_config.last_login_at_attribute_name,    :type => Time
             field sorcery_config.last_logout_at_attribute_name,   :type => Time
             field sorcery_config.last_activity_at_attribute_name, :type => Time
+            field sorcery_config.login_count_attribute_name,      :type => Integer
+          end
+        end
+
+        module InstanceMethods
+
+          # Called by the controller to increment the logins counter.
+          def increase_login_count!
+            config = sorcery_config
+            self.increment(config.login_count_attribute_name)
+            self.save!(:validate => false)
           end
         end
       end

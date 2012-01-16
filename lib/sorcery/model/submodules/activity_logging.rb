@@ -51,7 +51,7 @@ module Sorcery
 
         module InstanceMethods
 
-          # Called by the controller to increment the logins counter.
+          # Called by the controller to increment the login counter.
           def increase_login_count!
             config = sorcery_config
             self.increment(config.login_count_attribute_name)

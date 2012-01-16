@@ -34,8 +34,7 @@ module Sorcery
           return_to_url = session[:return_to_url]
           reset_session # protect from session fixation attacks
           session[:return_to_url] = return_to_url
-          auto_login(user)
-          after_login!(user, credentials)
+          auto_login(user, credentials)
           current_user
         else
           after_failed_login!(credentials)
@@ -84,9 +83,10 @@ module Sorcery
       #
       # @param [<User-Model>] user the user instance.
       # @return - do not depend on the return value.
-      def auto_login(user)
+      def auto_login(user, *credentials)
         session[:user_id] = user.id
         @current_user = user
+        after_login!(user, credentials)
       end
 
       # Overwrite Rails' handle unverified request

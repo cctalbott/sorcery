@@ -78,6 +78,21 @@ module Sorcery
                   }
                   @access_token = self.get_access_token(args, options)
                 end
+                
+                # overrided for protocols/oauth2.rb
+                def get_access_token(args, options = {})
+                  client = build_client(options)
+                  client.auth_code.get_token(
+                    args[:code],
+                    {
+                      :redirect_uri => @callback_url,
+                      :parse => :query
+                    },
+                    {
+                      :header_format => 'OAuth %s'
+                    }
+                  )
+                end
               end
               init
             end
